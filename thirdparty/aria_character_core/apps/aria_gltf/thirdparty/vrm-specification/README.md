@@ -1,3 +1,0 @@
-# vrm-specification
-
-vrm specification
