@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/ingydotnet/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/V-Sekai-fire/aria-character-core.git
+	branch = main
+	commit = 05818a159cd2bff4600173f52ab739b7969b63b3
+	parent = c0fadecb5b712460db8623c09acc5469e3bcbc50
+	method = merge
+	cmdver = 0.4.9
