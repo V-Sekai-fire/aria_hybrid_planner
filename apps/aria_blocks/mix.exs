@@ -1,11 +1,11 @@
 # Copyright (c) 2025-present K. S. Ernest (iFire) Lee
 
-defmodule AriaBlocksWorld.MixProject do
+defmodule AriaBlocks.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :aria_blocks_world,
+      app: :aria_blocks,
       version: "0.1.0",
       build_path: "../../_build",
       config_path: "../../config/config.exs",

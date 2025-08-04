@@ -1,6 +1,6 @@
 # Copyright (c) 2025-present K. S. Ernest (iFire) Lee
 
-defmodule AriaBlocksWorld.Domain do
+defmodule AriaBlocks.Domain do
   @moduledoc """
   Blocks world domain implementation following R25W1398085 unified durative action specification.
 

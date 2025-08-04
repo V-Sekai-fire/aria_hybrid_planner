@@ -1,6 +1,6 @@
 # Copyright (c) 2025-present K. S. Ernest (iFire) Lee
 
-defmodule AriaBlocksWorld.PlanValidationTest do
+defmodule AriaBlocks.PlanValidationTest do
   @moduledoc """
   Test suite to validate specific plan sequences for legality.
   """
@@ -102,10 +102,10 @@ defmodule AriaBlocksWorld.PlanValidationTest do
   # Helper function to execute a single action directly
   defp execute_action(state, {action_name, args}) do
     case action_name do
-      :unstack -> AriaBlocksWorld.Domain.unstack(state, args)
-      :putdown -> AriaBlocksWorld.Domain.putdown(state, args)
-      :pickup -> AriaBlocksWorld.Domain.pickup(state, args)
-      :stack -> AriaBlocksWorld.Domain.stack(state, args)
+      :unstack -> AriaBlocks.Domain.unstack(state, args)
+      :putdown -> AriaBlocks.Domain.putdown(state, args)
+      :pickup -> AriaBlocks.Domain.pickup(state, args)
+      :stack -> AriaBlocks.Domain.stack(state, args)
       _ -> {:error, :unknown_action}
     end
   end

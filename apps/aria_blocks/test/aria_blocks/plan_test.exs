@@ -1,6 +1,6 @@
 # Copyright (c) 2025-present K. S. Ernest (iFire) Lee
 
-defmodule AriaBlocksWorld.GtpyhopExamplesTest do
+defmodule AriaBlocks.GtpyhopExamplesTest do
   @moduledoc """
   Test suite that validates AriaBlocksWorld against the GTpyhop blocks_gtn examples.
 
@@ -26,7 +26,7 @@ defmodule AriaBlocksWorld.GtpyhopExamplesTest do
         "hand" => %{"holding" => false}
       })
 
-      domain = AriaBlocksWorld.Domain.create()
+      domain = AriaBlocks.Domain.create()
       # These should fail because 'a' is on 'b' (can't pickup something that's not clear)
       # and 'b' has something on it
       result = AriaHybridPlanner.plan(domain, state1, [{:pickup, ["a"]}])
@@ -44,7 +44,7 @@ defmodule AriaBlocksWorld.GtpyhopExamplesTest do
         "c" => %{"pos" => "table", "clear" => true},
         "hand" => %{"holding" => false}
       })
-      domain = AriaBlocksWorld.Domain.create()
+      domain = AriaBlocks.Domain.create()
       # pickup 'c' should work (it's clear and on table)
       {:ok, result} = AriaHybridPlanner.plan(domain, state1, [{:pickup, ["c"]}])
       todos = AriaEngineCore.Plan.get_primitive_actions_dfs(result.solution_tree)
@@ -81,7 +81,7 @@ defmodule AriaBlocksWorld.GtpyhopExamplesTest do
       }
 
       Logger.debug("Goals: #{inspect(goal1a.goals)}")
-      domain = AriaBlocksWorld.Domain.create()
+      domain = AriaBlocks.Domain.create()
       {:ok, result} = AriaHybridPlanner.plan(domain, state1, [goal1a], verbose: 3)
       assert [{:unstack, ["a", "b"]}, {:putdown, ["a"]}, {:pickup, ["b"]}, {:stack, ["b", "a"]}, {:pickup, ["c"]}, {:stack, ["c", "b"]}] = AriaEngineCore.Plan.get_primitive_actions_dfs(result.solution_tree)
     end
@@ -109,7 +109,7 @@ defmodule AriaBlocksWorld.GtpyhopExamplesTest do
 
       Logger.debug("Goals: #{inspect(sussman_goal.goals)}")
 
-      domain = AriaBlocksWorld.Domain.create()
+      domain = AriaBlocks.Domain.create()
       {:ok, result} = AriaHybridPlanner.plan(domain, sussman_initial, [sussman_goal])
       todos = AriaEngineCore.Plan.get_primitive_actions_dfs(result.solution_tree)
       assert [{:unstack, ["c", "a"]}, {:putdown, ["c"]}, {:pickup, ["b"]}, {:stack, ["b", "c"]}, {:pickup, ["a"]}, {:stack, ["a", "b"]}] = todos
@@ -139,7 +139,7 @@ defmodule AriaBlocksWorld.GtpyhopExamplesTest do
 
       Logger.debug("Goals: #{inspect(goal2.goals)}")
       Logger.debug("Expected GTpyhop plan: [('unstack', 'a', 'c'), ('putdown', 'a'), ('unstack', 'b', 'd'), ('stack', 'b', 'c'), ('pickup', 'a'), ('stack', 'a', 'd')]")
-      domain = AriaBlocksWorld.Domain.create()
+      domain = AriaBlocks.Domain.create()
 
       # Expected plan from GTpyhop:
       #
@@ -162,7 +162,7 @@ defmodule AriaBlocksWorld.GtpyhopExamplesTest do
           {"pos", "a", "table"}
         ],
       }
-      domain = AriaBlocksWorld.Domain.create()
+      domain = AriaBlocks.Domain.create()
 
       # Test planning without execution
       assert {:ok, solution_tree} = AriaHybridPlanner.plan(domain, state1, [goal])
