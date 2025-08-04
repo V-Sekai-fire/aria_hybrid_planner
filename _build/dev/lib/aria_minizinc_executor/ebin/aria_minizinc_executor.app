@@ -1,0 +1,13 @@
+{application,aria_minizinc_executor,
+             [{modules,['Elixir.AriaMinizincExecutor',
+                        'Elixir.AriaMinizincExecutor.Application',
+                        'Elixir.AriaMinizincExecutor.Executor',
+                        'Elixir.AriaMinizincExecutor.ExecutorBehaviour',
+                        'Elixir.AriaMinizincExecutor.TemplateRenderer']},
+              {optional_applications,[]},
+              {applications,[kernel,stdlib,elixir,logger,porcelain,jason,
+                             timex]},
+              {description,"aria_minizinc_executor"},
+              {registered,[]},
+              {vsn,"0.1.0"},
+              {mod,{'Elixir.AriaMinizincExecutor.Application',[]}}]}.
