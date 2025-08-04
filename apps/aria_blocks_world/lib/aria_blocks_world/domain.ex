@@ -47,9 +47,9 @@ defmodule AriaBlocksWorld.Domain do
   @action true
   @spec pickup(AriaState.t(), []) :: {:ok, AriaState.t()} | {:error, atom()}
   def pickup(state, [block]) do
-    is_clear = AriaState.get_fact(state, "clear", block)
-    hand_holding = AriaState.get_fact(state, "holding", "hand")
-    current_pos = AriaState.get_fact(state, "pos", block)
+    is_clear = AriaState.get_fact(state, block, "clear")
+    hand_holding = AriaState.get_fact(state, "hand", "holding")
+    current_pos = AriaState.get_fact(state, block, "pos")
 
     cond do
       current_pos != "table" -> {:error, :not_on_table}
@@ -57,9 +57,9 @@ defmodule AriaBlocksWorld.Domain do
       hand_holding != false -> {:error, :hand_not_empty}
       true ->
         new_state = state
-        |> AriaState.set_fact("pos", block, "hand")
-        |> AriaState.set_fact("clear", block, false)
-        |> AriaState.set_fact("holding", "hand", block)
+        |> AriaState.set_fact(block, "pos", "hand")
+        |> AriaState.set_fact(block, "clear", false)
+        |> AriaState.set_fact("hand", "holding", block)
         {:ok, new_state}
     end
   end
@@ -82,9 +82,9 @@ defmodule AriaBlocksWorld.Domain do
   @spec unstack(AriaState.t(), [block()]) :: {:ok, AriaState.t()} | {:error, atom()}
   def unstack(state, [block1, block2]) do
     # Check preconditions
-    current_pos = AriaState.get_fact(state, "pos", block1)
-    is_clear = AriaState.get_fact(state, "clear", block1)
-    hand_holding = AriaState.get_fact(state, "holding", "hand")
+    current_pos = AriaState.get_fact(state, block1, "pos")
+    is_clear = AriaState.get_fact(state, block1, "clear")
+    hand_holding = AriaState.get_fact(state, "hand", "holding")
 
     cond do
       current_pos != block2 -> {:error, :not_on_target_block}
@@ -93,13 +93,13 @@ defmodule AriaBlocksWorld.Domain do
       true ->
         # Execute action
         new_state = state
-        |> AriaState.set_fact("pos", block1, "hand")
-        |> AriaState.set_fact("clear", block1, false)
-        |> AriaState.set_fact("holding", "hand", block1)
+        |> AriaState.set_fact(block1, "pos", "hand")
+        |> AriaState.set_fact(block1, "clear", false)
+        |> AriaState.set_fact("hand", "holding", block1)
 
         # Only set block2 clear if it's not the table
         new_state = if block2 != "table" do
-          AriaState.set_fact(new_state, "clear", block2, true)
+          AriaState.set_fact(new_state, block2, "clear", true)
         else
           new_state
         end
@@ -123,16 +123,16 @@ defmodule AriaBlocksWorld.Domain do
   @spec putdown(AriaState.t(), [block()]) :: {:ok, AriaState.t()} | {:error, atom()}
   def putdown(state, [block]) do
     # Check preconditions
-    hand_holding = AriaState.get_fact(state, "holding", "hand")
+    hand_holding = AriaState.get_fact(state, "hand", "holding")
 
     cond do
       hand_holding != block -> {:error, :not_holding_block}
       true ->
         # Execute action
         new_state = state
-        |> AriaState.set_fact("pos", block, "table")
-        |> AriaState.set_fact("clear", block, true)
-        |> AriaState.set_fact("holding", "hand", false)
+        |> AriaState.set_fact(block, "pos", "table")
+        |> AriaState.set_fact(block, "clear", true)
+        |> AriaState.set_fact("hand", "holding", false)
 
         {:ok, new_state}
     end
@@ -155,8 +155,8 @@ defmodule AriaBlocksWorld.Domain do
   @spec stack(AriaState.t(), [block()]) :: {:ok, AriaState.t()} | {:error, atom()}
   def stack(state, [block1, block2]) do
     # Check preconditions
-    hand_holding = AriaState.get_fact(state, "holding", "hand")
-    block2_clear = AriaState.get_fact(state, "clear", block2)
+    hand_holding = AriaState.get_fact(state, "hand", "holding")
+    block2_clear = AriaState.get_fact(state, block2, "clear")
 
     cond do
       hand_holding != block1 -> {:error, :not_holding_block}
@@ -164,10 +164,10 @@ defmodule AriaBlocksWorld.Domain do
       true ->
         # Execute action
         new_state = state
-        |> AriaState.set_fact("pos", block1, block2)
-        |> AriaState.set_fact("clear", block1, true)
-        |> AriaState.set_fact("holding", "hand", false)
-        |> AriaState.set_fact("clear", block2, false)
+        |> AriaState.set_fact(block1, "pos", block2)
+        |> AriaState.set_fact(block1, "clear", true)
+        |> AriaState.set_fact("hand", "holding", false)
+        |> AriaState.set_fact(block2, "clear", false)
 
         {:ok, new_state}
     end
@@ -182,7 +182,7 @@ defmodule AriaBlocksWorld.Domain do
   @task_method true
   @spec take(AriaState.t(), [block()]) :: {:ok, [AriaHybridPlanner.todo_item()]} | {:error, atom()}
   def take(state, [block]) do
-    current_pos = AriaState.get_fact(state, "pos", block)
+    current_pos = AriaState.get_fact(state, block, "pos")
     if current_pos == nil do
       {:error, :block_not_found}
     else
@@ -204,7 +204,7 @@ defmodule AriaBlocksWorld.Domain do
   @task_method true
   @spec move_block(AriaState.t(), [any()]) :: {:ok, [AriaHybridPlanner.todo_item()]} | {:error, atom()}
   def move_block(state, [block, destination]) do
-    current_pos = AriaState.get_fact(state, "pos", block)
+    current_pos = AriaState.get_fact(state, block, "pos")
 
     # Determine pickup/unstack action
     pickup_action = case current_pos do
@@ -249,7 +249,7 @@ defmodule AriaBlocksWorld.Domain do
   @task_method true
   @spec put_method(AriaState.t(), [block() | String.t()]) :: {:ok, [AriaHybridPlanner.todo_item()]} | {:error, atom()}
   def put_method(state, [block, destination]) do
-    holding = AriaState.get_fact(state, "holding", "hand")
+    holding = AriaState.get_fact(state, "hand", "holding")
 
     if holding == block do
       case destination do
@@ -273,17 +273,17 @@ defmodule AriaBlocksWorld.Domain do
   @unigoal_method predicate: "pos"
   @spec achieve_position(AriaState.t(), {String.t(), String.t()}) :: {:ok, [AriaHybridPlanner.todo_item()]} | {:error, atom()}
   def achieve_position(state, {block, destination}) do
-    current_pos = AriaState.get_fact(state, "pos", block)
+    current_pos = AriaState.get_fact(state, block, "pos")
 
     # If already at destination, no action needed
     if current_pos == destination do
       {:ok, []}
     else
       # Check what subgoals are actually needed
-      is_clear = AriaState.get_fact(state, "clear", block)
+      is_clear = AriaState.get_fact(state, block, "clear")
       destination_clear = case destination do
         "table" -> true  # Table is always available
-        dest_block -> AriaState.get_fact(state, "clear", dest_block)
+        dest_block -> AriaState.get_fact(state, dest_block, "clear")
       end
 
       # Build subgoals list based on what's actually needed
@@ -331,17 +331,17 @@ defmodule AriaBlocksWorld.Domain do
   @unigoal_method predicate: "pos"
   @spec achieve_position_direct(AriaState.t(), {String.t(), String.t()}) :: {:ok, [AriaHybridPlanner.todo_item()]} | {:error, atom()}
   def achieve_position_direct(state, {block, destination}) do
-    current_pos = AriaState.get_fact(state, "pos", block)
+    current_pos = AriaState.get_fact(state, block, "pos")
 
     # If already at destination, no action needed
     if current_pos == destination do
       {:ok, []}
     else
       # Check if we can move directly (both block and destination must be clear)
-      is_clear = AriaState.get_fact(state, "clear", block)
+      is_clear = AriaState.get_fact(state, block, "clear")
       destination_clear = case destination do
         "table" -> true  # Table is always available
-        dest_block -> AriaState.get_fact(state, "clear", dest_block)
+        dest_block -> AriaState.get_fact(state, dest_block, "clear")
       end
 
       if is_clear == true and destination_clear == true do
@@ -374,7 +374,7 @@ defmodule AriaBlocksWorld.Domain do
   @unigoal_method predicate: "clear"
   @spec achieve_clear(AriaState.t(), {String.t(), boolean()}) :: {:ok, [AriaHybridPlanner.todo_item()]} | {:error, atom()}
   def achieve_clear(state, {block, true}) do
-    is_clear = AriaState.get_fact(state, "clear", block)
+    is_clear = AriaState.get_fact(state, block, "clear")
 
     # If already clear, no action needed
     if is_clear == true do
@@ -399,7 +399,7 @@ defmodule AriaBlocksWorld.Domain do
   @unigoal_method predicate: "clear"
   @spec achieve_clear(AriaState.t(), {String.t(), boolean()}) :: {:ok, [AriaHybridPlanner.todo_item()]} | {:error, atom()}
   def achieve_clear(state, {block, false}) do
-    is_clear = AriaState.get_fact(state, "clear", block)
+    is_clear = AriaState.get_fact(state, block, "clear")
 
     # If already not clear, no action needed
     if is_clear == false do
@@ -506,9 +506,9 @@ defmodule AriaBlocksWorld.Domain do
 
   defp register_entity(state, [entity_id, type, capabilities]) do
     state
-    |> AriaState.set_fact("type", entity_id, type)
-    |> AriaState.set_fact("capabilities", entity_id, capabilities)
-    |> AriaState.set_fact("status", entity_id, "available")
+    |> AriaState.set_fact(entity_id, "type", type)
+    |> AriaState.set_fact(entity_id, "capabilities", capabilities)
+    |> AriaState.set_fact(entity_id, "status", "available")
   end
 
   defp find_block_on_top(state, target_block) do
@@ -516,7 +516,7 @@ defmodule AriaBlocksWorld.Domain do
     all_blocks = get_all_blocks(state)
 
     Enum.find(all_blocks, fn block ->
-      AriaState.get_fact(state, "pos", block) == target_block
+      AriaState.get_fact(state, block, "pos") == target_block
     end)
   end
 
@@ -584,7 +584,7 @@ defmodule AriaBlocksWorld.Domain do
       is_done?(state, goal_map, block) ->
         :done
 
-      not AriaState.get_fact(state, "clear", block) ->
+      not AriaState.get_fact(state, block, "clear") ->
         :inaccessible
 
       not Map.has_key?(goal_map, block) or Map.get(goal_map, block) == "table" ->
@@ -592,7 +592,7 @@ defmodule AriaBlocksWorld.Domain do
 
       true ->
         destination = Map.get(goal_map, block)
-        if is_done?(state, goal_map, destination) and AriaState.get_fact(state, "clear", destination) do
+        if is_done?(state, goal_map, destination) and AriaState.get_fact(state, destination, "clear") do
           :move_to_block
         else
           :waiting
@@ -606,14 +606,14 @@ defmodule AriaBlocksWorld.Domain do
       block == "table" ->
         true
 
-      Map.has_key?(goal_map, block) and Map.get(goal_map, block) != AriaState.get_fact(state, "pos", block) ->
+      Map.has_key?(goal_map, block) and Map.get(goal_map, block) != AriaState.get_fact(state, block, "pos") ->
         false
 
-      AriaState.get_fact(state, "pos", block) == "table" ->
+      AriaState.get_fact(state, block, "pos") == "table" ->
         true
 
       true ->
-        current_pos = AriaState.get_fact(state, "pos", block)
+        current_pos = AriaState.get_fact(state, block, "pos")
         is_done?(state, goal_map, current_pos)
     end
   end

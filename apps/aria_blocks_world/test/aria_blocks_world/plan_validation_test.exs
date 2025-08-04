@@ -12,9 +12,10 @@ defmodule AriaBlocksWorld.PlanValidationTest do
     test "validate left sequence: optimal plan" do
       # Initial state: a on b, b on table, c on table
       initial_state = AriaState.new(%{
-        pos: %{"a" => "b", "b" => "table", "c" => "table"},
-        clear: %{"a" => true, "b" => false, "c" => true},
-        holding: %{"hand" => false}
+        "a" => %{"pos" => "b", "clear" => true},
+        "b" => %{"pos" => "table", "clear" => false},
+        "c" => %{"pos" => "table", "clear" => true},
+        "hand" => %{"holding" => false}
       })
 
       # Left sequence (optimal)
@@ -32,9 +33,9 @@ defmodule AriaBlocksWorld.PlanValidationTest do
       case result do
         {:ok, final_state} ->
           # Check if final state matches goal: c on b, b on a, a on table
-          assert AriaState.get_fact(final_state, "pos", "c") == "b"
-          assert AriaState.get_fact(final_state, "pos", "b") == "a"
-          assert AriaState.get_fact(final_state, "pos", "a") == "table"
+          assert AriaState.get_fact(final_state, "c", "pos") == "b"
+          assert AriaState.get_fact(final_state, "b", "pos") == "a"
+          assert AriaState.get_fact(final_state, "a", "pos") == "table"
           Logger.info("Left sequence is LEGAL and achieves the goal")
         {:error, {action, reason}} ->
           Logger.error("Left sequence is ILLEGAL: Action #{inspect(action)} failed with reason: #{reason}")
@@ -45,9 +46,10 @@ defmodule AriaBlocksWorld.PlanValidationTest do
     test "validate right sequence: longer plan with repeated actions" do
       # Initial state: a on b, b on table, c on table
       initial_state = AriaState.new(%{
-        pos: %{"a" => "b", "b" => "table", "c" => "table"},
-        clear: %{"a" => true, "b" => false, "c" => true},
-        holding: %{"hand" => false}
+        "a" => %{"pos" => "b", "clear" => true},
+        "b" => %{"pos" => "table", "clear" => false},
+        "c" => %{"pos" => "table", "clear" => true},
+        "hand" => %{"holding" => false}
       })
 
       # Right sequence (longer with repeated actions)
@@ -71,9 +73,9 @@ defmodule AriaBlocksWorld.PlanValidationTest do
           Logger.info("Right sequence is LEGAL")
           # Check final state
           pos_facts = %{
-            "a" => AriaState.get_fact(final_state, "pos", "a"),
-            "b" => AriaState.get_fact(final_state, "pos", "b"),
-            "c" => AriaState.get_fact(final_state, "pos", "c")
+            "a" => AriaState.get_fact(final_state, "a", "pos"),
+            "b" => AriaState.get_fact(final_state, "b", "pos"),
+            "c" => AriaState.get_fact(final_state, "c", "pos")
           }
           Logger.info("Final state: pos=#{inspect(pos_facts)}")
         {:error, {action, reason}} ->

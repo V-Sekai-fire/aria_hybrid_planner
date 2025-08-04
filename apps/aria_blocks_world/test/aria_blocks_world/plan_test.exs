@@ -20,9 +20,10 @@ defmodule AriaBlocksWorld.GtpyhopExamplesTest do
       # state1.clear={'c':True, 'b':False,'a':True}
       # state1.holding={'hand':False}
       state1 = AriaState.new(%{
-        pos: %{"a" => "b", "b" => "table", "c" => "table"},
-        clear: %{"a" => true, "b" => false, "c" => true},
-        holding: %{"hand" => false}
+        "a" => %{"pos" => "b", "clear" => true},
+        "b" => %{"pos" => "table", "clear" => false},
+        "c" => %{"pos" => "table", "clear" => true},
+        "hand" => %{"holding" => false}
       })
 
       domain = AriaBlocksWorld.Domain.create()
@@ -38,9 +39,10 @@ defmodule AriaBlocksWorld.GtpyhopExamplesTest do
 
     test "simple pickup operations that should succeed" do
       state1 = AriaState.new(%{
-        pos: %{"a" => "b", "b" => "table", "c" => "table"},
-        clear: %{"a" => true, "b" => false, "c" => true},
-        holding: %{"hand" => false}
+        "a" => %{"pos" => "b", "clear" => true},
+        "b" => %{"pos" => "table", "clear" => false},
+        "c" => %{"pos" => "table", "clear" => true},
+        "hand" => %{"holding" => false}
       })
       domain = AriaBlocksWorld.Domain.create()
       # pickup 'c' should work (it's clear and on table)
@@ -63,9 +65,10 @@ defmodule AriaBlocksWorld.GtpyhopExamplesTest do
       Logger.debug("=== Test: multigoal: c on b, b on a, a on table ===")
 
       state1 = AriaState.new(%{
-        pos: %{"a" => "b", "b" => "table", "c" => "table"},
-        clear: %{"a" => true, "b" => false, "c" => true},
-        holding: %{"hand" => false}
+        "a" => %{"pos" => "b", "clear" => true},
+        "b" => %{"pos" => "table", "clear" => false},
+        "c" => %{"pos" => "table", "clear" => true},
+        "hand" => %{"holding" => false}
       })
 
       # Goal: c on b, b on a, a on table
@@ -90,9 +93,10 @@ defmodule AriaBlocksWorld.GtpyhopExamplesTest do
       # sus_s0.clear={'c':True, 'a':False,'b':True}
       # sus_s0.holding={'hand':False}
       sussman_initial = AriaState.new(%{
-        pos: %{"c" => "a", "a" => "table", "b" => "table"},
-        clear: %{"c" => true, "a" => false, "b" => true},
-        holding: %{"hand" => false}
+        "c" => %{"pos" => "a", "clear" => true},
+        "a" => %{"pos" => "table", "clear" => false},
+        "b" => %{"pos" => "table", "clear" => true},
+        "hand" => %{"holding" => false}
       })
 
       # Goal: a on b, b on c
@@ -118,9 +122,11 @@ defmodule AriaBlocksWorld.GtpyhopExamplesTest do
       # state2.clear={'a':True, 'c':False,'b':True, 'd':False}
       # state2.holding={'hand':False}
       state2 = AriaState.new(%{
-        pos: %{"a" => "c", "b" => "d", "c" => "table", "d" => "table"},
-        clear: %{"a" => true, "b" => true, "c" => false, "d" => false},
-        holding: %{"hand" => false}
+        "a" => %{"pos" => "c", "clear" => true},
+        "b" => %{"pos" => "d", "clear" => true},
+        "c" => %{"pos" => "table", "clear" => false},
+        "d" => %{"pos" => "table", "clear" => false},
+        "hand" => %{"holding" => false}
       })
 
       # Goal: b on c, a on d
@@ -143,9 +149,10 @@ defmodule AriaBlocksWorld.GtpyhopExamplesTest do
 
     test "planning only (no execution)" do
       state1 = AriaState.new(%{
-        pos: %{"a" => "b", "b" => "table", "c" => "table"},
-        clear: %{"a" => true, "b" => false, "c" => true},
-        holding: %{"hand" => false}
+        "a" => %{"pos" => "b", "clear" => true},
+        "b" => %{"pos" => "table", "clear" => false},
+        "c" => %{"pos" => "table", "clear" => true},
+        "hand" => %{"holding" => false}
       })
 
       goal = %AriaEngineCore.Multigoal{
