@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/V-Sekai-fire/aria-character-core.git
 	branch = main
-	commit = 05818a159cd2bff4600173f52ab739b7969b63b3
-	parent = c0fadecb5b712460db8623c09acc5469e3bcbc50
+	commit = 1cf298b11d6f6706ed3458688b398ffdd8a5265c
+	parent = fd51b2de7b59a4a58688bc7b404853bf3da5d024
 	method = merge
 	cmdver = 0.4.9
