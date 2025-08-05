@@ -241,17 +241,39 @@ defmodule Plan.ReentrantExecutor do
       end
       {:error, :todo_item_blacklisted}
     else
+      # Get execution timing information
+      start_time = :os.system_time(:millisecond)
+
       # Execute the todo item using universal execution
-      case execute_todo_item_universal(domain, state, action_name, args, opts) do
+      result = execute_todo_item_universal(domain, state, action_name, args, opts)
+
+      end_time = :os.system_time(:millisecond)
+      actual_duration = (end_time - start_time) / 1000.0  # Convert to seconds
+
+      # Log execution timing if TimeLogger is available
+      if Code.ensure_loaded?(AriaTemporalBlocks.TimeLogger) do
+        # Calculate planned duration from domain
+        planned_duration = AriaTemporalBlocks.TimeLogger.extract_action_duration(domain, action_name, args)
+
+        # Convert timestamps to relative seconds (simplified for demo)
+        planned_start = 0.0  # Would be calculated from timeline in real implementation
+        actual_start = start_time / 1000.0  # Convert to seconds
+
+        AriaTemporalBlocks.TimeLogger.log_execution_timing(
+          action_name, args, planned_start, actual_start, planned_duration, actual_duration
+        )
+      end
+
+      case result do
         {:ok, new_state} ->
           if verbose > 2 do
-            Logger.debug("ReentrantExecutor: Todo item executed successfully: #{action_name}")
+            Logger.debug("ReentrantExecutor: Todo item executed successfully: #{action_name} (#{actual_duration}s)")
           end
           {:ok, new_state}
 
         {:error, reason} ->
           if verbose > 2 do
-            Logger.debug("ReentrantExecutor: Todo item execution failed: #{action_name}, reason: #{reason}")
+            Logger.debug("ReentrantExecutor: Todo item execution failed: #{action_name}, reason: #{reason} (#{actual_duration}s)")
           end
           {:error, reason}
       end

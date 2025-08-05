@@ -41,9 +41,27 @@ defmodule AriaHybridPlanner do
   @type execution_result :: {:ok, {solution_tree(), state()}} | {:error, String.t()}
   @type lazy_execution_result :: {:ok, state()} | {:error, String.t()}
 
-  # Delegate to internal modules
   @spec plan(domain(), state(), [todo_item()], keyword()) :: plan_result()
-  defdelegate plan(domain, initial_state, todos, opts \\ []), to: AriaEngineCore.Plan
+  def plan(domain, initial_state, todos, opts \\ []) do
+    # Call the actual planning function
+    case AriaEngineCore.Plan.plan(domain, initial_state, todos, opts) do
+      {:ok, plan_result} = success_result ->
+        # Log the planned timeline if TimeLogger is available
+        if Code.ensure_loaded?(AriaTemporalBlocks.TimeLogger) do
+          solution_tree = Map.get(plan_result, :solution_tree)
+          if solution_tree do
+            # Extract temporal logging options from opts
+            temporal_opts = Keyword.take(opts, [:scheduled_start_time, :use_iso_format])
+            AriaTemporalBlocks.TimeLogger.log_planned_timeline(solution_tree, domain, temporal_opts)
+          end
+        end
+
+        success_result
+
+      error_result ->
+        error_result
+    end
+  end
 
   @spec run_lazy(domain(), state(), [todo_item()], keyword()) :: execution_result()
   def run_lazy(domain, initial_state, todos, opts \\ []) do
