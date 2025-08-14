@@ -2,7 +2,7 @@
 
 Here's the complete implementation plan for converting `apps/aria_minizinc_executor` into a Unifex C node:
 
-### Core Requirements Met:
+### Core Requirements Met
 
 ✅ **Embed libminizinc** as library (not CLI)  
 ✅ **Maintain exact same API** for backward compatibility  
@@ -203,7 +203,7 @@ end
 - Performance benchmarking vs current Porcelain approach
 - Memory leak testing for long-running processes
 
-### Implementation Benefits:
+### Implementation Benefits
 
 1. **Performance**: ~10-50x faster (no process spawning, direct library calls)
 2. **Memory**: Lower memory overhead (no temporary files, subprocess pipes)
